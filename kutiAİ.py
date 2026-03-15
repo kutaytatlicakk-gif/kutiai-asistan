@@ -5,20 +5,16 @@ import google.generativeai as genai
 st.set_page_config(page_title="KutiAİ VIP", page_icon="🤖", layout="centered")
 
 st.title("🤖 KutiAİ VIP Asistan")
-st.caption("Gemini 1.5 Flash - En Güncel Sürüm")
+st.caption("v1.1 - En Hızlı Yapay Zeka Sürümü")
 st.divider()
 
-# --- 2. API BAĞLANTISI ---
+# --- 2. API VE MODEL BAĞLANTISI ---
 api_key = st.secrets.get("GOOGLE_API_KEY")
 
 if api_key:
     genai.configure(api_key=api_key)
-    # HATA ÇÖZÜMÜ: Başına 'models/' ekleyerek en garanti yolu seçiyoruz
-    try:
-        model = genai.GenerativeModel("models/gemini-1.5-flash")
-    except:
-        # Eğer yukarıdaki olmazsa alternatif isimle deniyoruz
-        model = genai.GenerativeModel("gemini-1.5-flash")
+    # HATA ÇÖZÜMÜ: Buradaki model ismini 'gemini-1.5-flash-latest' yapıyoruz
+    model = genai.GenerativeModel("gemini-1.5-flash-latest")
 else:
     st.error("⚠️ API Anahtarı bulunamadı!")
     st.stop()
@@ -39,13 +35,14 @@ if prompt := st.chat_input("KutiAİ'ye bir şeyler sorun..."):
 
     with st.chat_message("assistant"):
         try:
-            # Yanıt üretirken versiyon hatası almamak için v1beta yerine standart yöntemi kullanıyoruz
+            # Yanıt üretme
             response = model.generate_content(prompt)
             st.markdown(response.text)
             st.session_state.messages.append({"role": "assistant", "content": response.text})
         except Exception as e:
-            # Detaylı hata mesajı gösterelim ki sorun olursa hemen çözelim
-            st.error(f"Bir hata oluştu: {str(e)}")
+            # Hata kodunu çok kısa gösterelim
+            st.error("Bir bağlantı sorunu oluştu, lütfen sayfayı yenileyin.")
+            print(f"Hata detayı: {e}")
 
 # --- 5. YAN MENÜ ---
 with st.sidebar:
